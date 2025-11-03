@@ -1,44 +1,89 @@
-// fuck u lunar scammers
+import express, { Request, Response } from "express";
+import cors from "cors";
 
-import fetch from "node-fetch"; 
+const app = express();
+const port = 3000;
 
-async function checkLocalLauncherStatus() {
-    try {
-        const baseURL = "http://127.0.0.1:3000"; 
-        const statusResponse = await fetch(`${baseURL}/launcher/status`);
-        const statusData = await statusResponse.json();
-        console.log("Status from local server:", statusData);
-        console.log("Client version:", "1.2");
+app.use(cors());
+app.use(express.json());
 
-        if (statusData.version !== "1.2") {
-            console.warn("Launcher version mismatch! Please update.");
-        }
+// lunar scammers.
+app.use((req: Request, res: Response, next) => {
+  console.log(`// fuck u lunar scammers`);
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
 
-        const http = await import('http');
-        http.get(`${baseURL}/api/launcher/poll-auth`, (res) => {
-            // poll auth :3
-            let data = "";
-            res.on("data", chunk => data += chunk);
-            res.on("end", () => {
-                try {
-                    const authData = JSON.parse(data);
-                    console.log("Local auth poll data:", authData);
-                } catch (err) {
-                    console.error("Error parsing auth poll response:", err);
-                }
-            });
-        }).on("error", err => {
-            console.error("HTTP GET error:", err);
-        });
+/**
+ * /launcher/status
+// launcher status
+ */
+app.get("/launcher/status", (req: Request, res: Response) => {
+  res.json({
+    version: "1.2!",
+    status: "ok",
+    uptime: Math.floor(process.uptime()), 
+  });
+});
 
-     const username = "LUNA";
-        const emailResponse = await fetch(`${baseURL}/account/api/get-email?username=${encodeURIComponent(username)}`);
-        const emailData = await emailResponse.json();
-        console.log("Local email data for user:", emailData);
+ ///api/launcher/poll-auth
+// polls!
+app.get("/api/launcher/poll-auth", (req: Request, res: Response) => {
+  res.json({
+    ticketId: `FAKE_TICKET_${Math.random().toString(36).slice(2, 10).toUpperCase()}`,
+    state: "Queued",
+    queuedPlayers: 0,
+    estimatedWaitSec: 0,
+    status: "ok",
+  });
+});
 
-    } catch (err) {
-        console.error("Error in local launcher API workflow:", err);
-    }
-}
 
-checkLocalLauncherStatus();
+// /account/api/get-email
+// Usage: /account/api/get-email?username=LUNA
+ 
+app.get("/account/api/get-email", (req: Request, res: Response) => {
+  const username = (req.query.username as string) || "unknown";
+  const email = `${username.replace(/\s+/g, "").toLowerCase()}@local.mock`;
+  res.json({
+    username,
+    email,
+    message: "This is a mocked email for local testing only.",
+  });
+});
+
+
+app.post("/bypass", (req: Request, res: Response) => {
+  const username = (req.body?.username as string) || "anonymous";
+  res.json({
+    success: true,
+    note: "yes",
+    username,
+    token: `LOCAL_FAKE_TOKEN_${Math.random().toString(36).slice(2, 10)}`,
+    profile: {
+      displayName: username,
+      id: Math.floor(Math.random() * 1_000_000),
+      email: `${username.replace(/\s+/g, "").toLowerCase()}@local.mock`,
+    },
+  });
+});
+
+
+app.post("/api/launcher/login", (req: Request, res: Response) => {
+  const { username } = req.body || { username: "unknown" };
+  res.json({
+    ok: true,
+    message: "Local mock login accepted (development only).",
+    username,
+    token: `LOCAL_LOGIN_TOKEN_${Math.random().toString(36).slice(2, 10)}`,
+  });
+});
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("Lunar is a Scam!.");
+});
+
+app.listen(port, () => {
+  console.log(`[DEV] SERVER at http://127.0.0.1:${port}`);
+});
+

@@ -14,10 +14,7 @@ app.use((req: Request, res: Response, next) => {
   next();
 });
 
-/**
- * /launcher/status
-// launcher status
- */
+
 app.get("/launcher/status", (req: Request, res: Response) => {
   res.json({
     version: "1.2!",
@@ -26,7 +23,7 @@ app.get("/launcher/status", (req: Request, res: Response) => {
   });
 });
 
- ///api/launcher/poll-auth
+
 // polls!
 app.get("/api/launcher/poll-auth", (req: Request, res: Response) => {
   res.json({
@@ -39,7 +36,6 @@ app.get("/api/launcher/poll-auth", (req: Request, res: Response) => {
 });
 
 
-// /account/api/get-email
 // Usage: /account/api/get-email?username=LUNA
  
 app.get("/account/api/get-email", (req: Request, res: Response) => {
@@ -54,6 +50,7 @@ app.get("/account/api/get-email", (req: Request, res: Response) => {
 
 
 app.post("/bypass", (req: Request, res: Response) => {
+  // will not work you need to add it LMAO!
   const username = (req.body?.username as string) || "anonymous";
   res.json({
     success: true,
@@ -73,7 +70,7 @@ app.post("/api/launcher/login", (req: Request, res: Response) => {
   const { username } = req.body || { username: "unknown" };
   res.json({
     ok: true,
-    message: "Local mock login accepted (development only).",
+    message: "yes!",
     username,
     token: `LOCAL_LOGIN_TOKEN_${Math.random().toString(36).slice(2, 10)}`,
   });
